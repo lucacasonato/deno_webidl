@@ -61,8 +61,18 @@ function generateDictionary(w: CBW, type: webidl.DictionaryType) {
       w.write(", required: true");
     }
     if (member.default) {
-      w.write(", defaultValue: ");
-      generateValue(w, member.default);
+      if (
+        member.default.type == "sequence" || member.default.type == "dictionary"
+      ) {
+        w.write(", get defaultValue()");
+        w.block(() => {
+          w.write("return ");
+          generateValue(w, member.default!);
+        });
+      } else {
+        w.write(", defaultValue: ");
+        generateValue(w, member.default);
+      }
     }
     w.write(" },");
   }
